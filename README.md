@@ -40,6 +40,7 @@ The following commands are available:
 
 - `task_manager add "task description"` - Add a new task
 - `task_manager list` - Show all tasks
+- `task_manager show <task id>` - Show detailed task information
 - `task_manager complete <task id>` - Mark a task as complete
 - `task_manager delete <task id>` - Remove a task
 - `task_manager start <task id>` - Start timing a task
@@ -61,6 +62,14 @@ Started time tracking for task 1
 
 $ task_manager stop 1
 Stopped time tracking for task 1. Duration: 0h 5m
+
+$ task_manager show 1
+Task 1: [ ] Write documentation
+
+Total time: 0h 5m
+
+Time entries:
+1. 2023-05-20 14:30 to 2023-05-20 14:35 (0h 5m)
 
 $ task_manager complete 1
 Task 1 marked as complete!
