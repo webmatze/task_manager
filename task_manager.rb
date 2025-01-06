@@ -48,6 +48,9 @@ class TaskManager
   def complete_task(id)
     task = @tasks.find { |t| t[:id] == id }
     if task
+      # Stop timing if task is currently being tracked
+      stop_time(id) if task[:current_entry]
+      
       task[:completed] = true
       save_tasks
       puts "Task #{id} marked as complete!"
