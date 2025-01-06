@@ -29,9 +29,19 @@ class TaskManager
     puts "\nTasks:"
     @tasks.each do |task|
       status = task[:completed] ? "[✓]" : "[ ]"
-      time_status = task[:current_entry] ? "[🕒 Tracking]" : ""
-      total_time = format_duration(task[:total_time] || 0)
-      puts "#{task[:id]}. #{status} #{task[:description]} - Total time: #{total_time} #{time_status}"
+      total_time = task[:total_time] || 0
+      
+      # Calculate current session time if task is being tracked
+      if task[:current_entry]
+        current_session_time = Time.now - task[:current_entry]
+        current_time_str = " + #{format_duration(current_session_time)}"
+        time_status = "[🕒 Active]"
+      else
+        current_time_str = ""
+        time_status = ""
+      end
+
+      puts "#{task[:id]}. #{status} #{task[:description]} - Total time: #{format_duration(total_time)}#{current_time_str} #{time_status}"
     end
   end
 
