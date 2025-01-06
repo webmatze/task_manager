@@ -15,7 +15,7 @@ class TaskManager
     }
     @tasks << task
     save_tasks
-    puts "Task added: #{description}"
+    puts "Task added: [#{task[:id]}] #{description}"
   end
 
   def list_tasks
