@@ -30,16 +30,16 @@ A command-line task management application built in Ruby that helps you manage t
 
 ## Usage
 
-The following commands are available:
+The following commands are available (with shortcuts):
 
-- `add <task description>` - Add a new task
-- `list` - Show all tasks
-- `complete <task id>` - Mark a task as complete
-- `delete <task id>` - Remove a task
-- `start <task id>` - Start timing a task
-- `stop <task id>` - Stop timing a task
-- `help` - Display available commands
-- `exit` - Close the application
+- `add` or `a <task description>` - Add a new task
+- `list` or `l` or `ls` - Show all tasks
+- `complete` or `c <task id>` - Mark a task as complete
+- `delete` or `d` or `del <task id>` - Remove a task
+- `start` or `s <task id>` - Start timing a task
+- `stop` or `p <task id>` - Stop timing a task ('p' for pause)
+- `help` or `h` or `?` - Display available commands
+- `exit` or `q` or `quit` - Close the application
 
 ### Example Usage
 

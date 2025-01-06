@@ -122,14 +122,14 @@ require 'json'
 
 def show_usage
   puts "\nUsage:"
-  puts "  add <task description> - Add a new task"
-  puts "  list                   - List all tasks"
-  puts "  complete <task id>     - Mark a task as complete"
-  puts "  delete <task id>       - Delete a task"
-  puts "  start <task id>        - Start time tracking for a task"
-  puts "  stop <task id>         - Stop time tracking for a task"
-  puts "  help                   - Show this help message"
-  puts "  exit                   - Exit the program"
+  puts "  add, a <task description>  - Add a new task"
+  puts "  list, l, ls               - List all tasks"
+  puts "  complete, c <task id>     - Mark a task as complete"
+  puts "  delete, d, del <task id>  - Delete a task"
+  puts "  start, s <task id>        - Start time tracking for a task"
+  puts "  stop, p <task id>         - Stop time tracking for a task"
+  puts "  help, h, ?               - Show this help message"
+  puts "  exit, q, quit            - Exit the program"
 end
 
 task_manager = TaskManager.new
@@ -142,41 +142,41 @@ loop do
   command, *args = input.split(' ')
 
   case command
-  when 'add'
+  when 'add', 'a'
     if args.empty?
       puts "Please provide a task description"
     else
       task_manager.add_task(args.join(' '))
     end
-  when 'list'
+  when 'list', 'l', 'ls'
     task_manager.list_tasks
-  when 'complete'
+  when 'complete', 'c'
     if args[0]
       task_manager.complete_task(args[0].to_i)
     else
       puts "Please provide a task ID"
     end
-  when 'delete'
+  when 'delete', 'd', 'del'
     if args[0]
       task_manager.delete_task(args[0].to_i)
     else
       puts "Please provide a task ID"
     end
-  when 'start'
+  when 'start', 's'
     if args[0]
       task_manager.start_time(args[0].to_i)
     else
       puts "Please provide a task ID"
     end
-  when 'stop'
+  when 'stop', 'p'  # 'p' for pause
     if args[0]
       task_manager.stop_time(args[0].to_i)
     else
       puts "Please provide a task ID"
     end
-  when 'help'
+  when 'help', 'h', '?'
     show_usage
-  when 'exit'
+  when 'exit', 'q', 'quit'
     puts "Goodbye!"
     break
   else
