@@ -23,10 +23,16 @@ A command-line task management application built in Ruby that helps you manage t
    git clone [repository-url]
    cd [repository-name]
    ```
-3. Run the application:
+3. Make the script executable:
    ```bash
-   ruby task_manager.rb
+   chmod +x task_manager.rb
    ```
+4. Create a symbolic link to make it available system-wide:
+   ```bash
+   sudo ln -s "$(pwd)/task_manager.rb" /usr/local/bin/task_manager
+   ```
+
+Now you can use the `task_manager` command from anywhere in your terminal!
 
 ## Usage
 
