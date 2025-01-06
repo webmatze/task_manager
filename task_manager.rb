@@ -122,7 +122,21 @@ class TaskManager
 
   def load_tasks
     @tasks = if File.exist?('tasks.json')
-               JSON.parse(File.read('tasks.json'), symbolize_names: true)
+               tasks = JSON.parse(File.read('tasks.json'), symbolize_names: true)
+               tasks.map do |task|
+                 # Convert current_entry back to Time object if it exists
+                 task[:current_entry] = Time.parse(task[:current_entry]) if task[:current_entry]
+                 
+                 # Convert time entries timestamps back to Time objects
+                 if task[:time_entries]
+                   task[:time_entries].map! do |entry|
+                     entry[:start] = Time.parse(entry[:start])
+                     entry[:end] = Time.parse(entry[:end])
+                     entry
+                   end
+                 end
+                 task
+               end
              else
                []
              end
@@ -131,6 +145,7 @@ end
 
 # CLI interface
 require 'json'
+require 'time'
 
 def show_usage
   puts "\nUsage: task_manager <command> [arguments]"
