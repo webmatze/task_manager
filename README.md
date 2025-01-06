@@ -90,4 +90,4 @@ Tasks are automatically saved to a `tasks.json` file in the application director
 
 ## License
 
-[Add your chosen license here]
+This project is licensed under the MIT License - see the LICENSE file for details.
