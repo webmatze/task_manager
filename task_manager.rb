@@ -168,7 +168,7 @@ class TaskManager
 
   def load_tasks
     @tasks = if File.exist?(@storage_path)
-               tasks = JSON.parse(File.read('tasks.json'), symbolize_names: true)
+               tasks = JSON.parse(File.read(@storage_path), symbolize_names: true)
                tasks.map do |task|
                  # Convert current_entry back to Time object if it exists
                  task[:current_entry] = Time.parse(task[:current_entry]) if task[:current_entry]
