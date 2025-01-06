@@ -22,15 +22,20 @@ A command-line task management application built in Ruby that helps you manage t
 
 1. Ensure you have Ruby installed on your system
 2. Clone this repository:
+
    ```bash
-   git clone [repository-url]
-   cd [repository-name]
+   git clone https://github.com/webmatze/task_manager.git
+   cd task_manager
    ```
+
 3. Make the script executable:
+
    ```bash
    chmod +x task_manager.rb
    ```
+
 4. Create a symbolic link to make it available system-wide:
+
    ```bash
    sudo ln -s "$(pwd)/task_manager.rb" /usr/local/bin/task_manager
    ```
