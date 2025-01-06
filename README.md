@@ -12,6 +12,10 @@ A command-line task management application built in Ruby that helps you manage t
   - Multiple time entries per task
   - Total time tracking
   - Visual indicator for active timing
+- Time reporting
+  - Daily summary of time entries
+  - Total time per day
+  - Chronological listing of all activities
 - Flexible storage options
   - Local tasks per project/directory
   - Global tasks accessible from anywhere
@@ -54,6 +58,7 @@ The following commands are available:
 - `task_manager start <task id>` - Start timing a task
 - `task_manager stop <task id>` - Stop timing a task
 - `task_manager help` - Display available commands
+- `task_manager report` - Show daily time report
 
 ### Local vs Global Tasks
 
@@ -113,6 +118,39 @@ Task 1 marked as complete!
 $ task_manager list
 Tasks:
 1. [✓] Write documentation - Total time: 0h 5m
+```
+
+### Time Reports
+
+The task manager can generate detailed daily reports of all time entries:
+
+```bash
+$ task_manager report
+Time Report:
+------------
+
+Monday, May 22, 2023:
+Total: 2h 15m
+  [1] Write documentation
+      09:00 - 10:30 (1h 30m)
+  [2] Review code
+      14:00 - 14:45 (0h 45m)
+
+Sunday, May 21, 2023:
+Total: 1h 45m
+  [1] Write documentation
+      13:00 - 14:45 (1h 45m)
+```
+
+Reports show:
+- Daily summaries with total time
+- Individual task entries with start and end times
+- Task IDs for easy reference
+- Chronological ordering (most recent first)
+
+Like other commands, you can use `--global` to see reports for your global tasks:
+```bash
+task_manager --global report
 ```
 
 ## Data Storage
