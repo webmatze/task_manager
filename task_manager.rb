@@ -112,6 +112,47 @@ class TaskManager
     end
   end
 
+  def generate_report
+    # Collect all time entries from all tasks
+    all_entries = @tasks.flat_map do |task|
+      (task[:time_entries] || []).map do |entry|
+        {
+          task_id: task[:id],
+          description: task[:description],
+          start: entry[:start],
+          end: entry[:end],
+          duration: entry[:duration]
+        }
+      end
+    end
+
+    return puts "No time entries found." if all_entries.empty?
+
+    # Group entries by date
+    entries_by_date = all_entries.group_by { |entry| entry[:start].to_date }
+
+    # Sort dates in descending order (most recent first)
+    sorted_dates = entries_by_date.keys.sort.reverse
+
+    puts "\nTime Report:"
+    puts "------------"
+
+    sorted_dates.each do |date|
+      daily_entries = entries_by_date[date]
+      total_daily_time = daily_entries.sum { |entry| entry[:duration] }
+      
+      puts "\n#{date.strftime('%A, %B %d, %Y')}:"
+      puts "Total: #{format_duration(total_daily_time)}"
+      
+      daily_entries.sort_by { |entry| entry[:start] }.each do |entry|
+        start_time = entry[:start].strftime("%H:%M")
+        end_time = entry[:end].strftime("%H:%M")
+        puts "  [#{entry[:task_id]}] #{entry[:description]}"
+        puts "      #{start_time} - #{end_time} (#{format_duration(entry[:duration])})"
+      end
+    end
+  end
+
   def show_task(id)
     task = @tasks.find { |t| t[:id] == id }
     if task
@@ -203,6 +244,7 @@ def show_usage
   puts "  delete, d, del <task id>  - Delete a task"
   puts "  start, s <task id>        - Start time tracking for a task"
   puts "  stop, p <task id>         - Stop time tracking for a task"
+  puts "  report, r                 - Show time entries grouped by day"
   puts "  help, h                   - Show this help message"
 end
 
@@ -260,6 +302,8 @@ def process_command(args)
     else
       puts "Please provide a task ID"
     end
+  when 'report', 'r'
+    task_manager.generate_report
   when 'help', 'h', '?', nil
     show_usage
   else
