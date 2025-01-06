@@ -1,9 +1,14 @@
 #!/usr/bin/env ruby
 
+require 'json'
+require 'time'
+require 'fileutils'
+
 # Create a TaskManager class to handle core functionality
 class TaskManager
-  def initialize
+  def initialize(use_global_storage = false)
     @tasks = []
+    @storage_path = determine_storage_path(use_global_storage)
     load_tasks
   end
 
@@ -149,11 +154,20 @@ class TaskManager
   end
 
   def save_tasks
-    File.write('tasks.json', JSON.generate(@tasks))
+    FileUtils.mkdir_p(File.dirname(@storage_path)) unless File.directory?(File.dirname(@storage_path))
+    File.write(@storage_path, JSON.generate(@tasks))
+  end
+
+  def determine_storage_path(use_global_storage)
+    if use_global_storage
+      File.join(Dir.home, '.task_manager', 'tasks.json')
+    else
+      'tasks.json'
+    end
   end
 
   def load_tasks
-    @tasks = if File.exist?('tasks.json')
+    @tasks = if File.exist?(@storage_path)
                tasks = JSON.parse(File.read('tasks.json'), symbolize_names: true)
                tasks.map do |task|
                  # Convert current_entry back to Time object if it exists
@@ -176,11 +190,11 @@ class TaskManager
 end
 
 # CLI interface
-require 'json'
-require 'time'
 
 def show_usage
-  puts "\nUsage: task_manager <command> [arguments]"
+  puts "\nUsage: task_manager [--global] <command> [arguments]"
+  puts "\nOptions:"
+  puts "  --global                  - Use global tasks file (~/.task_manager/tasks.json)"
   puts "\nCommands:"
   puts "  add, a <task description>  - Add a new task"
   puts "  list, l, ls               - List all tasks"
@@ -193,8 +207,17 @@ def show_usage
 end
 
 def process_command(args)
-  task_manager = TaskManager.new
+  # Extract global flag if present
+  global_flag_index = args.index('--global')
+  use_global_storage = false
+  
+  if global_flag_index
+    use_global_storage = true
+    args.delete_at(global_flag_index)
+  end
 
+  task_manager = TaskManager.new(use_global_storage)
+  
   command = args[0]
   rest = args[1..]
 
