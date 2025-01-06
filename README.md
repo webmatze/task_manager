@@ -12,6 +12,9 @@ A command-line task management application built in Ruby that helps you manage t
   - Multiple time entries per task
   - Total time tracking
   - Visual indicator for active timing
+- Flexible storage options
+  - Local tasks per project/directory
+  - Global tasks accessible from anywhere
 - Persistent storage using JSON
 - Simple command-line interface
 
@@ -47,6 +50,34 @@ The following commands are available:
 - `task_manager stop <task id>` - Stop timing a task
 - `task_manager help` - Display available commands
 
+### Local vs Global Tasks
+
+The task manager supports two storage modes:
+
+1. **Local Tasks** (default)
+   - Stored in `tasks.json` in the current directory
+   - Perfect for project-specific tasks
+   - Can be committed to version control
+   - Different task lists for different projects
+
+2. **Global Tasks**
+   - Stored in `~/.task_manager/tasks.json`
+   - Accessible from any directory
+   - Perfect for personal tasks
+   - Single task list across all locations
+
+Use the `--global` flag with any command to access global tasks:
+
+```bash
+# Local task examples
+task_manager add "Project specific task"
+task_manager list
+
+# Global task examples
+task_manager --global add "Call dentist"
+task_manager --global list
+```
+
 ### Example Usage
 
 ```bash
@@ -81,7 +112,14 @@ Tasks:
 
 ## Data Storage
 
-Tasks are automatically saved to a `tasks.json` file in the application directory. This ensures your tasks and time tracking data persist between sessions.
+Tasks are automatically saved to one of two locations:
+
+- Local tasks: `tasks.json` in the current directory
+- Global tasks: `~/.task_manager/tasks.json` in your home directory
+
+The storage location is determined by the presence of the `--global` flag when running commands.
+Local storage is perfect for project-specific tasks that you might want to commit to version control,
+while global storage is ideal for personal tasks that you want to access from anywhere.
 
 ## Requirements
 
