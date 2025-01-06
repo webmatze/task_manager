@@ -30,37 +30,36 @@ A command-line task management application built in Ruby that helps you manage t
 
 ## Usage
 
-The following commands are available (with shortcuts):
+The following commands are available:
 
-- `add` or `a <task description>` - Add a new task
-- `list` or `l` or `ls` - Show all tasks
-- `complete` or `c <task id>` - Mark a task as complete
-- `delete` or `d` or `del <task id>` - Remove a task
-- `start` or `s <task id>` - Start timing a task
-- `stop` or `p <task id>` - Stop timing a task ('p' for pause)
-- `help` or `h` or `?` - Display available commands
-- `exit` or `q` or `quit` - Close the application
+- `task_manager add "task description"` - Add a new task
+- `task_manager list` - Show all tasks
+- `task_manager complete <task id>` - Mark a task as complete
+- `task_manager delete <task id>` - Remove a task
+- `task_manager start <task id>` - Start timing a task
+- `task_manager stop <task id>` - Stop timing a task
+- `task_manager help` - Display available commands
 
 ### Example Usage
 
 ```bash
-Enter command: add Write documentation
+$ task_manager add "Write documentation"
 New Task added: Write documentation
 
-Enter command: list
+$ task_manager list
 Tasks:
 1. [ ] Write documentation - Total time: 0h 0m
 
-Enter command: start 1
+$ task_manager start 1
 Started time tracking for task 1
 
-Enter command: stop 1
+$ task_manager stop 1
 Stopped time tracking for task 1. Duration: 0h 5m
 
-Enter command: complete 1
+$ task_manager complete 1
 Task 1 marked as complete!
 
-Enter command: list
+$ task_manager list
 Tasks:
 1. [✓] Write documentation - Total time: 0h 5m
 ```

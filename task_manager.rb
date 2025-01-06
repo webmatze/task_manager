@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 # Create a TaskManager class to handle core functionality
 class TaskManager
   def initialize
@@ -121,65 +123,63 @@ end
 require 'json'
 
 def show_usage
-  puts "\nUsage:"
+  puts "\nUsage: task_manager <command> [arguments]"
+  puts "\nCommands:"
   puts "  add, a <task description>  - Add a new task"
   puts "  list, l, ls               - List all tasks"
   puts "  complete, c <task id>     - Mark a task as complete"
   puts "  delete, d, del <task id>  - Delete a task"
   puts "  start, s <task id>        - Start time tracking for a task"
   puts "  stop, p <task id>         - Stop time tracking for a task"
-  puts "  help, h, ?               - Show this help message"
-  puts "  exit, q, quit            - Exit the program"
+  puts "  help, h                   - Show this help message"
 end
 
-task_manager = TaskManager.new
+def process_command(args)
+  task_manager = TaskManager.new
 
-puts "Welcome to Task Manager! Type 'help' for commands."
-
-loop do
-  print "\nEnter command: "
-  input = gets.chomp
-  command, *args = input.split(' ')
+  command = args[0]
+  rest = args[1..]
 
   case command
   when 'add', 'a'
-    if args.empty?
+    if rest.empty?
       puts "Please provide a task description"
     else
-      task_manager.add_task(args.join(' '))
+      task_manager.add_task(rest.join(' '))
     end
   when 'list', 'l', 'ls'
     task_manager.list_tasks
   when 'complete', 'c'
-    if args[0]
-      task_manager.complete_task(args[0].to_i)
+    if rest[0]
+      task_manager.complete_task(rest[0].to_i)
     else
       puts "Please provide a task ID"
     end
   when 'delete', 'd', 'del'
-    if args[0]
-      task_manager.delete_task(args[0].to_i)
+    if rest[0]
+      task_manager.delete_task(rest[0].to_i)
     else
       puts "Please provide a task ID"
     end
   when 'start', 's'
-    if args[0]
-      task_manager.start_time(args[0].to_i)
+    if rest[0]
+      task_manager.start_time(rest[0].to_i)
     else
       puts "Please provide a task ID"
     end
-  when 'stop', 'p'  # 'p' for pause
-    if args[0]
-      task_manager.stop_time(args[0].to_i)
+  when 'stop', 'p'
+    if rest[0]
+      task_manager.stop_time(rest[0].to_i)
     else
       puts "Please provide a task ID"
     end
-  when 'help', 'h', '?'
+  when 'help', 'h', '?', nil
     show_usage
-  when 'exit', 'q', 'quit'
-    puts "Goodbye!"
-    break
   else
-    puts "Unknown command. Type 'help' for usage."
+    puts "Unknown command. Type 'task_manager help' for usage."
   end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  process_command(ARGV)
 end
