@@ -107,6 +107,35 @@ class TaskManager
     end
   end
 
+  def show_task(id)
+    task = @tasks.find { |t| t[:id] == id }
+    if task
+      status = task[:completed] ? "[✓]" : "[ ]"
+      puts "\nTask #{task[:id]}: #{status} #{task[:description]}"
+      
+      if task[:current_entry]
+        current_session_time = Time.now - task[:current_entry]
+        puts "Currently tracking: #{format_duration(current_session_time)} [🕒 Active]"
+      end
+      
+      puts "\nTotal time: #{format_duration(task[:total_time] || 0)}"
+      
+      if task[:time_entries]&.any?
+        puts "\nTime entries:"
+        task[:time_entries].each_with_index do |entry, index|
+          duration = format_duration(entry[:duration])
+          start_time = entry[:start].strftime("%Y-%m-%d %H:%M")
+          end_time = entry[:end].strftime("%Y-%m-%d %H:%M")
+          puts "#{index + 1}. #{start_time} to #{end_time} (#{duration})"
+        end
+      else
+        puts "\nNo time entries recorded."
+      end
+    else
+      puts "Task not found."
+    end
+  end
+
   private
 
   def format_duration(seconds)
@@ -155,6 +184,7 @@ def show_usage
   puts "\nCommands:"
   puts "  add, a <task description>  - Add a new task"
   puts "  list, l, ls               - List all tasks"
+  puts "  show, v <task id>         - Show detailed task information"
   puts "  complete, c <task id>     - Mark a task as complete"
   puts "  delete, d, del <task id>  - Delete a task"
   puts "  start, s <task id>        - Start time tracking for a task"
@@ -198,6 +228,12 @@ def process_command(args)
   when 'stop', 'p'
     if rest[0]
       task_manager.stop_time(rest[0].to_i)
+    else
+      puts "Please provide a task ID"
+    end
+  when 'show', 'v'
+    if rest[0]
+      task_manager.show_task(rest[0].to_i)
     else
       puts "Please provide a task ID"
     end
