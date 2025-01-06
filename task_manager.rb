@@ -155,7 +155,7 @@ class TaskManager
 
   def save_tasks
     FileUtils.mkdir_p(File.dirname(@storage_path)) unless File.directory?(File.dirname(@storage_path))
-    File.write(@storage_path, JSON.generate(@tasks))
+    File.write(@storage_path, JSON.pretty_generate(@tasks))
   end
 
   def determine_storage_path(use_global_storage)
