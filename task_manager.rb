@@ -333,41 +333,41 @@ def process_command(args)
   
   case command
   when 'add', 'a'
-    if rest.empty?
+    if remaining_args.empty?
       puts "Please provide a task description"
     else
-      task_manager.add_task(rest.join(' '))
+      task_manager.add_task(remaining_args.join(' '))
     end
   when 'list', 'l', 'ls'
     options = parse_list_options(remaining_args)
     task_manager.list_tasks(options)
   when 'complete', 'c'
-    if rest[0]
-      task_manager.complete_task(rest[0].to_i)
+    if remaining_args[0]
+      task_manager.complete_task(remaining_args[0].to_i)
     else
       puts "Please provide a task ID"
     end
   when 'delete', 'd', 'del'
-    if rest[0]
-      task_manager.delete_task(rest[0].to_i)
+    if remaining_args[0]
+      task_manager.delete_task(remaining_args[0].to_i)
     else
       puts "Please provide a task ID"
     end
   when 'start', 's'
-    if rest[0]
-      task_manager.start_time(rest[0].to_i)
+    if remaining_args[0]
+      task_manager.start_time(remaining_args[0].to_i)
     else
       puts "Please provide a task ID"
     end
   when 'stop', 'p'
-    if rest[0]
-      task_manager.stop_time(rest[0].to_i)
+    if remaining_args[0]
+      task_manager.stop_time(remaining_args[0].to_i)
     else
       puts "Please provide a task ID"
     end
   when 'show', 'v'
-    if rest[0]
-      task_manager.show_task(rest[0].to_i)
+    if remaining_args[0]
+      task_manager.show_task(remaining_args[0].to_i)
     else
       puts "Please provide a task ID"
     end
