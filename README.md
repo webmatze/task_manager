@@ -2,7 +2,7 @@
 
 A command-line task management application built in Ruby that helps you manage tasks and track time spent on each task.
 
-![Task Manager Demo](assets/demo.gif)
+[![Task Manager](assets/demo.gif)](https://github.com/webmatze/task_manager)
 
 ## Features
 
@@ -145,12 +145,14 @@ Total: 1h 45m
 ```
 
 Reports show:
+
 - Daily summaries with total time
 - Individual task entries with start and end times
 - Task IDs for easy reference
 - Chronological ordering (most recent first)
 
 Like other commands, you can use `--global` to see reports for your global tasks:
+
 ```bash
 task_manager --global report
 ```
