@@ -2,6 +2,8 @@
 
 A command-line task management application built in Ruby that helps you manage tasks and track time spent on each task.
 
+![Task Manager Demo](assets/demo.gif)
+
 ## Features
 
 - Create and manage tasks
