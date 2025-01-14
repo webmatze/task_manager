@@ -3,6 +3,57 @@
 require 'json'
 require 'time'
 require 'fileutils'
+require 'optparse'
+
+def parse_global_options(args)
+  options = { global: false }
+  global_index = args.index('--global')
+  if global_index
+    options[:global] = true
+    args.delete_at(global_index)
+  end
+  [options, args]
+end
+
+def parse_report_options(args)
+  options = {}
+  parser = OptionParser.new do |opts|
+    opts.banner = "Usage: task_manager report [options]"
+    
+    opts.on("-d", "--date DATE", "Show report for specific date (YYYY-MM-DD)") do |date|
+      options[:date] = Date.parse(date)
+    end
+    
+    opts.on("-t", "--today", "Show report for today only") do
+      options[:date] = Date.today
+    end
+    
+    opts.on("-w", "--week", "Show report for this week") do
+      options[:week] = true
+    end
+  end
+  
+  parser.parse!(args)
+  options
+end
+
+def parse_list_options(args)
+  options = {}
+  parser = OptionParser.new do |opts|
+    opts.banner = "Usage: task_manager list [options]"
+    
+    opts.on("-a", "--active", "Show only active tasks") do
+      options[:active_only] = true
+    end
+    
+    opts.on("-c", "--completed", "Show only completed tasks") do
+      options[:completed_only] = true
+    end
+  end
+  
+  parser.parse!(args)
+  options
+end
 
 # Create a TaskManager class to handle core functionality
 class TaskManager
@@ -25,18 +76,24 @@ class TaskManager
     puts "Task added: [#{task[:id]}] #{description}"
   end
 
-  def list_tasks
+  def list_tasks(options = {})
     if @tasks.empty?
       puts "No tasks found."
       return
     end
 
+    filtered_tasks = @tasks
+    if options[:active_only]
+      filtered_tasks = filtered_tasks.reject { |t| t[:completed] }
+    elsif options[:completed_only]
+      filtered_tasks = filtered_tasks.select { |t| t[:completed] }
+    end
+
     puts "\nTasks:"
-    @tasks.each do |task|
+    filtered_tasks.each do |task|
       status = task[:completed] ? "[✓]" : "[ ]"
       total_time = task[:total_time] || 0
       
-      # Calculate current session time if task is being tracked
       if task[:current_entry]
         current_session_time = Time.now - task[:current_entry]
         current_time_str = " + #{format_duration(current_session_time)}"
@@ -112,8 +169,7 @@ class TaskManager
     end
   end
 
-  def generate_report
-    # Collect all time entries from all tasks
+  def generate_report(options = {})
     all_entries = @tasks.flat_map do |task|
       (task[:time_entries] || []).map do |entry|
         {
@@ -128,10 +184,12 @@ class TaskManager
 
     return puts "No time entries found." if all_entries.empty?
 
+    # Filter entries based on options
+    all_entries = filter_entries_by_date(all_entries, options)
+    return puts "No entries found for the specified time period." if all_entries.empty?
+
     # Group entries by date
     entries_by_date = all_entries.group_by { |entry| entry[:start].to_date }
-
-    # Sort dates in descending order (most recent first)
     sorted_dates = entries_by_date.keys.sort.reverse
 
     puts "\nTime Report:"
@@ -149,6 +207,20 @@ class TaskManager
         end_time = entry[:end].strftime("%H:%M")
         puts "  [#{entry[:task_id]}] #{entry[:description]}"
         puts "      #{start_time} - #{end_time} (#{format_duration(entry[:duration])})"
+      end
+    end
+  end
+
+  private
+
+  def filter_entries_by_date(entries, options)
+    return entries unless options[:date] || options[:week]
+
+    entries.select do |entry|
+      if options[:date]
+        entry[:start].to_date == options[:date]
+      elsif options[:week]
+        entry[:start].to_date.cweek == Date.today.cweek
       end
     end
   end
@@ -238,31 +310,27 @@ def show_usage
   puts "  --global                  - Use global tasks file (~/.task_manager/tasks.json)"
   puts "\nCommands:"
   puts "  add, a <task description>  - Add a new task"
-  puts "  list, l, ls               - List all tasks"
+  puts "  list, l, ls [options]      - List all tasks"
+  puts "    -a, --active            - Show only active tasks"
+  puts "    -c, --completed         - Show only completed tasks"
   puts "  show, v <task id>         - Show detailed task information"
   puts "  complete, c <task id>     - Mark a task as complete"
   puts "  delete, d, del <task id>  - Delete a task"
   puts "  start, s <task id>        - Start time tracking for a task"
   puts "  stop, p <task id>         - Stop time tracking for a task"
-  puts "  report, r                 - Show time entries grouped by day"
+  puts "  report, r [options]       - Show time entries grouped by day"
+  puts "    -d, --date DATE         - Show report for specific date (YYYY-MM-DD)"
+  puts "    -t, --today            - Show report for today only"
+  puts "    -w, --week             - Show report for this week"
   puts "  help, h                   - Show this help message"
 end
 
 def process_command(args)
-  # Extract global flag if present
-  global_flag_index = args.index('--global')
-  use_global_storage = false
+  global_options, remaining_args = parse_global_options(args)
+  command = remaining_args.shift
   
-  if global_flag_index
-    use_global_storage = true
-    args.delete_at(global_flag_index)
-  end
-
-  task_manager = TaskManager.new(use_global_storage)
+  task_manager = TaskManager.new(global_options[:global])
   
-  command = args[0]
-  rest = args[1..]
-
   case command
   when 'add', 'a'
     if rest.empty?
@@ -271,7 +339,8 @@ def process_command(args)
       task_manager.add_task(rest.join(' '))
     end
   when 'list', 'l', 'ls'
-    task_manager.list_tasks
+    options = parse_list_options(remaining_args)
+    task_manager.list_tasks(options)
   when 'complete', 'c'
     if rest[0]
       task_manager.complete_task(rest[0].to_i)
@@ -303,7 +372,8 @@ def process_command(args)
       puts "Please provide a task ID"
     end
   when 'report', 'r'
-    task_manager.generate_report
+    options = parse_report_options(remaining_args)
+    task_manager.generate_report(options)
   when 'help', 'h', '?', nil
     show_usage
   else
