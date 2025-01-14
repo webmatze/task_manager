@@ -211,20 +211,6 @@ class TaskManager
     end
   end
 
-  private
-
-  def filter_entries_by_date(entries, options)
-    return entries unless options[:date] || options[:week]
-
-    entries.select do |entry|
-      if options[:date]
-        entry[:start].to_date == options[:date]
-      elsif options[:week]
-        entry[:start].to_date.cweek == Date.today.cweek
-      end
-    end
-  end
-
   def show_task(id)
     task = @tasks.find { |t| t[:id] == id }
     if task
@@ -255,6 +241,18 @@ class TaskManager
   end
 
   private
+
+  def filter_entries_by_date(entries, options)
+    return entries unless options[:date] || options[:week]
+
+    entries.select do |entry|
+      if options[:date]
+        entry[:start].to_date == options[:date]
+      elsif options[:week]
+        entry[:start].to_date.cweek == Date.today.cweek
+      end
+    end
+  end
 
   def format_duration(seconds)
     hours = seconds / 3600
@@ -309,8 +307,8 @@ def show_usage
   puts "\nOptions:"
   puts "  --global                  - Use global tasks file (~/.task_manager/tasks.json)"
   puts "\nCommands:"
-  puts "  add, a <task description>  - Add a new task"
-  puts "  list, l, ls [options]      - List all tasks"
+  puts "  add, a <task description> - Add a new task"
+  puts "  list, l, ls [options]     - List all tasks"
   puts "    -a, --active            - Show only active tasks"
   puts "    -c, --completed         - Show only completed tasks"
   puts "  show, v <task id>         - Show detailed task information"
@@ -320,8 +318,8 @@ def show_usage
   puts "  stop, p <task id>         - Stop time tracking for a task"
   puts "  report, r [options]       - Show time entries grouped by day"
   puts "    -d, --date DATE         - Show report for specific date (YYYY-MM-DD)"
-  puts "    -t, --today            - Show report for today only"
-  puts "    -w, --week             - Show report for this week"
+  puts "    -t, --today             - Show report for today only"
+  puts "    -w, --week              - Show report for this week"
   puts "  help, h                   - Show this help message"
 end
 
