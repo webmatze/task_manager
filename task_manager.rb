@@ -23,6 +23,10 @@ def parse_add_options(args)
     opts.on("-s", "--start", "Start timing the task immediately after creation") do
       options[:start] = true
     end
+    
+    opts.on("-t", "--tags one,two,three", Array, "Comma-separated list of tags") do |tags|
+      options[:tags] = tags.map(&:strip)
+    end
   end
   
   parser.parse!(args)
@@ -77,17 +81,19 @@ class TaskManager
     load_tasks
   end
 
-  def add_task(description)
+  def add_task(description, tags = [])
     task = {
       id: next_id,
       description: description,
       completed: false,
       time_entries: [],  # Array to store multiple time entries
-      total_time: 0      # Total time spent in seconds
+      total_time: 0,     # Total time spent in seconds
+      tags: tags         # Array to store tags
     }
     @tasks << task
     save_tasks
-    puts "Task added: [#{task[:id]}] #{description}"
+    tags_str = task[:tags]&.any? ? " [#{task[:tags].join(', ')}]" : ""
+    puts "Task added: [#{task[:id]}] #{description}#{tags_str}"
     task[:id]  # Return the task id
   end
 
@@ -118,7 +124,8 @@ class TaskManager
         time_status = ""
       end
 
-      puts "#{task[:id]}. #{status} #{task[:description]} - Total time: #{format_duration(total_time)}#{current_time_str} #{time_status}"
+      tags_str = task[:tags]&.any? ? " [#{task[:tags].join(', ')}]" : ""
+      puts "#{task[:id]}. #{status} #{task[:description]}#{tags_str} - Total time: #{format_duration(total_time)}#{current_time_str} #{time_status}"
     end
   end
 
@@ -230,7 +237,8 @@ class TaskManager
     task = @tasks.find { |t| t[:id] == id }
     if task
       status = task[:completed] ? "[✓]" : "[ ]"
-      puts "\nTask #{task[:id]}: #{status} #{task[:description]}"
+      tags_str = task[:tags]&.any? ? " [#{task[:tags].join(', ')}]" : ""
+      puts "\nTask #{task[:id]}: #{status} #{task[:description]}#{tags_str}"
       
       if task[:current_entry]
         current_session_time = Time.now - task[:current_entry]
@@ -323,7 +331,8 @@ def show_usage
   puts "  --global                  - Use global tasks file (~/.task_manager/tasks.json)"
   puts "\nCommands:"
   puts "  add, a [options] <task description> - Add a new task"
-  puts "    -s, --start            - Start timing the task immediately"
+  puts "    -s, --start             - Start timing the task immediately"
+  puts "    -t, --tags one,two      - Comma-separated list of tags (e.g., --tags work,urgent)"
   puts "  list, l, ls [options]     - List all tasks"
   puts "    -a, --active            - Show only active tasks"
   puts "    -c, --completed         - Show only completed tasks"
@@ -351,7 +360,7 @@ def process_command(args)
       puts "Please provide a task description"
     else
       options = parse_add_options(remaining_args)
-      task_id = task_manager.add_task(remaining_args.join(' '))
+      task_id = task_manager.add_task(remaining_args.join(' '), options[:tags])
       task_manager.start_time(task_id) if options[:start]
     end
   when 'list', 'l', 'ls'
