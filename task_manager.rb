@@ -15,6 +15,20 @@ def parse_global_options(args)
   [options, args]
 end
 
+def parse_add_options(args)
+  options = {}
+  parser = OptionParser.new do |opts|
+    opts.banner = "Usage: task_manager add [options] <task description>"
+    
+    opts.on("-s", "--start", "Start timing the task immediately after creation") do
+      options[:start] = true
+    end
+  end
+  
+  parser.parse!(args)
+  options
+end
+
 def parse_report_options(args)
   options = {}
   parser = OptionParser.new do |opts|
@@ -74,6 +88,7 @@ class TaskManager
     @tasks << task
     save_tasks
     puts "Task added: [#{task[:id]}] #{description}"
+    task[:id]  # Return the task id
   end
 
   def list_tasks(options = {})
@@ -307,7 +322,8 @@ def show_usage
   puts "\nOptions:"
   puts "  --global                  - Use global tasks file (~/.task_manager/tasks.json)"
   puts "\nCommands:"
-  puts "  add, a <task description> - Add a new task"
+  puts "  add, a [options] <task description> - Add a new task"
+  puts "    -s, --start            - Start timing the task immediately"
   puts "  list, l, ls [options]     - List all tasks"
   puts "    -a, --active            - Show only active tasks"
   puts "    -c, --completed         - Show only completed tasks"
@@ -334,7 +350,9 @@ def process_command(args)
     if remaining_args.empty?
       puts "Please provide a task description"
     else
-      task_manager.add_task(remaining_args.join(' '))
+      options = parse_add_options(remaining_args)
+      task_id = task_manager.add_task(remaining_args.join(' '))
+      task_manager.start_time(task_id) if options[:start]
     end
   when 'list', 'l', 'ls'
     options = parse_list_options(remaining_args)
